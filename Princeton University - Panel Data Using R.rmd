@@ -1,0 +1,90 @@
+---
+title: "Princeton University - Panel Data Using R"
+author: "Pooya Shirazi"
+date: "March 19, 2018"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Getting Started in Fixed / Random Effects Models using R
+
+## Introduoction
+
+`Panel Data` (also known as `Longitudinal` or `Cross-sectional Time-series` data) is a dataset in which the behavior of entities are observed across time.
+
+These entities could be states, companies, individuals, countries, etc.
+
+## Exploring Panel Data
+
+```{r eval = TRUE, echo = TRUE, results = "hide", message = FALSE, warning = FALSE}
+# Load Required Packages: 
+library(tidyverse)
+library(plm)
+```
+
+```{r}
+# Read Data Examples from Local System:
+Panel.Data <- read.csv(file = "C:/Users/Pooya/OneDrive/My Tutorials/Academic/Princeton University - Panel Data Using R/Data.csv")
+
+# Compactly Display the Structure of Panel.Data:
+str(Panel.Data)
+```
+
+```{r}
+Panel.Data %>% 
+  ggplot(mapping = aes(x = year, y = y, color = country)) +
+  geom_point(size = 3) +
+  geom_smooth(se = FALSE, method = "loess") + 
+  theme(panel.background = element_rect(fill = "white", colour = "black", linetype = 1),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5), aspect.ratio = 1) +
+  scale_x_continuous(limits=c(1990,1999), breaks = c(1990:1999)) +
+  scale_y_continuous(labels = scales::comma)
+```
+
+
+```{r}
+# Exploring Panel.Data:
+Panel.Data %>% 
+  ggplot(mapping = aes(x = year, y = y)) +
+  geom_point() +
+  geom_line() + 
+  facet_wrap(facets = ~ country, nrow = 2) + 
+  theme(panel.background = element_rect(fill = "white", colour = "black"),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5), aspect.ratio = 1) +
+  scale_x_continuous(limits=c(1990,1999), breaks = c(1990:1999))
+```
+
+## Fixed-effects Model: Heterogeneity Across Countries (or Entities)
+
+```{r}
+Panel.Data %>% 
+  ggplot(mapping = aes(x=country, y=y)) + 
+  stat_summary() +
+  theme(panel.background = element_rect(fill = "white", colour = "black"),
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.5), aspect.ratio = 1,
+        plot.title = element_text(hjust = 0.5)) +
+  ggtitle(label = "Heterogeineity Across Countries")
+
+```
+
+## Fixed Effects: Heterogeneity Across Years
+
+```{r}
+Panel.Data %>% 
+  ggplot(mapping = aes(x=year, y=y)) + 
+  stat_summary() +
+  theme(panel.background = element_rect(fill = "white", colour = "black"),
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.5), aspect.ratio = 1/3,
+        plot.title = element_text(hjust = 0.5)) +
+  scale_x_continuous(limits=c(1990,1999), breaks = c(1990:1999)) +
+  ggtitle(label = "Heterogeineity Across Years")
+
+```
+
+```{r}
+library(gplots)
+plotmeans(y ~ year, main="Heterogeineity across years", data=Panel.Data)
+```
+
